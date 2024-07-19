@@ -1,24 +1,119 @@
-# Machine Learning Final Project | by Faith Villarreal and Ricky Zapata
+# Machine Learning Final Project by Faith Villarreal and Ricardo Zapata
 
-Introduction
-	This project addresses the dataset from Spotify's Research and Development team. The aim of this project is to answer a simple but elusive question: will a user skip this song? The dataset, named “Spotify Sequential Skip Prediction Challenge”, is set up such that models can be created to predict whether a user will listen to a track if it is played in some given order. More advanced machine learning algorithms could approximate how sequence and music features play into the outcome. For the purposes of this project, we elected to use the mini dataset provided by Spotify which has approximately 170,000 entries of user session data; the entirety of the larger dataset has a size exceeding 300GB.  The data is split into two separate .csv files: a log of the user's listening session and a log of track feature. The two datasets can be joined based on ‘track_id’: a unique identificator value representing some song. We used the pandas library to merge the two .csv files such that each session track would have both the user info and the track features. The data set contains a multitude of features of which we elected to use 46 features.
+## Introduction
+**Overview of the project**  
+	
+ This project addresses the dataset from Spotify's Research and Development team. The aim of this project is to answer a simple but elusive question: will a user skip this song? The dataset, named “Spotify Sequential Skip Prediction Challenge”, is set up such that models can be created to predict whether a user will listen to a track if it is played in some given order. More advanced machine learning algorithms could approximate how sequence and music features play into the outcome. For the purposes of this project, we elected to use the mini dataset provided by Spotify which has approximately 170,000 entries of user session data; the entirety of the larger dataset has a size exceeding 300GB.  The data is split into two separate .csv files: a log of the user's listening session and a log of track feature. The two datasets can be joined based on ‘track_id’: a unique identificator value representing some song. We used the pandas library to merge the two .csv files such that each session track would have both the user info and the track features. The data set contains a multitude of features of which we elected to use 46 features.
 This a binary classification problem, with the goal of predicting whether a user will skip the next track played. In this project, we experiment with three different classification models: logistic regression, support vector machines (SVM), and neural networks.
 
-Data Preparation
-Cleaning the Dataset
-	The raw dataset has no missing values, but did have features that contributed the prediction of whether the track was skipped. 
+---
+
+## Data Collection and Preparation
+**Cleaning The Dataset**  
+The raw dataset has no missing values, but did have features that contributed the prediction of whether the track was skipped. 
 The variables that contributed to the skip prediction where ‘skip_1’,  ‘skip_2’, ‘skip_3’, and ‘skipped’. We chose to use the result of OR-ing features ‘skip_1’,  ‘skip_2’, ‘skip_3’ as our predicted value for whether a song would be skipped or not. There were several features concerning skipping behavior:
 ‘skip_1’: Indicates if the track was only played very briefly.
 ‘skip_2’: Indicates if the track was only played briefly.
 ‘skip_3’: Indicates if most of the track was played.
 ‘not_skipped’: Indicates that the track was played in its entirety.
-We decided to OR the skip feature booleans in order to focus most simply on our mission with this data set: estimating whether a song will be skipped or not. We hope that this simplification of recognizing a skip (i.e. recognizing any skip as a skip, instead of more granularly how far into a song a song was skipped) will lessen the computational burden as well as offer more accurate estimates for unseen data by decreasing bias. 	
-Categorical Encoding
-	Many features within the dataset were not float values and thus had to be modified in order for the model to run. For features that had binary outcomes, such as whether the user was using shuffle, or if they had a premium subscription, we encoded the data to 0s and 1s. There were other categories that had much more variety in terms of category. We elected to use one-hot encoding for a large part of these features. For example, some categories described user behavior from the start of the song, indicating if they had reached this song by opening the app, or skipping the last song, or had paused before playing. These categories had zero logical order that would justify ordinal encoding so, despite the costly expansion of the feature columns, we used one-hot encoding. 
-	Included in the session log was the date on which a person listened to a song. We elected to break down the date into is year, day, month, and day_of_week components, of which we dropped the day feature. 
-Data Splitting
-	The data was split into a training set, and a testing set. The training set was 80% of the set and the testing set was 20% of the set. 
-Models
+We decided to OR the skip feature booleans in order to focus most simply on our mission with this data set: estimating whether a song will be skipped or not. We hope that this simplification of recognizing a skip (i.e. recognizing any skip as a skip, instead of more granularly how far into a song a song was skipped) will lessen the computational burden as well as offer more accurate estimates for unseen data by decreasing bias.
+
+**Categorical Encoding**  
+Many features within the dataset were not float values and thus had to be modified in order for the model to run. For features that had binary outcomes, such as whether the user was using shuffle, or if they had a premium subscription, we encoded the data to 0s and 1s. There were other categories that had much more variety in terms of category. We elected to use one-hot encoding for a large part of these features. For example, some categories described user behavior from the start of the song, indicating if they had reached this song by opening the app, or skipping the last song, or had paused before playing. These categories had zero logical order that would justify ordinal encoding so, despite the costly expansion of the feature columns, we used one-hot encoding. 
+	Included in the session log was the date on which a person listened to a song. We elected to break down the date into is year, day, month, and day_of_week components, of which we dropped the day feature.
+
+ **Data Splitting**  
+	The data was split into a training set, and a testing set. The training set was 80% of the set and the testing set was 20% of the set.
+
+---
+
+## Model Selection
+### Logistic Regression
+The first model that our team utilized was a logistic regression model for classifying whether a user would skip the song being played or not. We used Scikit-Learn's LogisticRegression from the linear model module as well as other modules from the Scikit-Learn library to work towards optimizing our logistic regression code. The following is how we worked toward acquiring the best hyperparameters.
+
+**L1 and L2 Regularization**
+
+The first step we took towards optimizing our linear regression code was implementing L1 and L2 regularization. For both L1 and L2, by looping through regularization strengths of 0.001, 0.01, 0.1, 1, 10, we created logistic regression models (using LogisticRegression) and tested their mean-squared error (MSE) and accuracy.
+
+Figure 1: L1 Regularization against Mean Squared Error (MSE) and Accuracy
+
+Figure 2: L2 Regularization against Mean Squared Error (MSE) and Accuracy
+
+After experimenting with L1 and L2 regularization strengths to consider what optimized the logistic regression model best, we used techniques such as standardization, Stratified K-Fold cross validation, and grid search to identify the model with the most optimized hyperparameters. We found that the best parameters were using L2 regularization with a strength of 0.1 and using SelectKBest we were able to select the 10 highest features by k-score. We were able to achieve a ROC-AUC score of 0.984762.
+
+Figure 3: Optimized Logistic Regression Classification Report
+
+
+Figure 4: Logistic Regression Coefficients (Optimized Model)
+Polynomial Feature Transformation
+The first type of feature transformation that our team implemented was polynomial feature transformation for our logistic regression model. In order to implement polynomial feature transformation, we utilized the Scikit-Learn library’s built-in preprocessing module which includes PolynomialFeatures. When attempting to use PolynomialFeatures with our data, our team had issues due to our computers not being able to handle the computational complexity required. After data reorganization and encoding, our featurespace had 76 features. Even for just degree 2 polynomial transformation, this means transforming the feature space to sustain computations for 5625–or 76 squared–features. Attempting to run this caused our computers to crash which inspired our pivot to a less computationally taxing feature transformation strategy.
+
+
+Dataset
+Polynomial Transformation Degree
+
+
+1 (no transformation)
+2
+Train
+0.9791592208720514
+N/A
+Test
+0.9791592208720514
+N/A
+
+Table 1: Polynomial transformation results
+Square Root Feature Transformation
+After being limited in our performance for polynomial feature transformation due to computational constraints, our pivot to square root feature transformation began by starting with the best parameters we already calculated for our original optimized logistic regression model. Making sure to maintain that each respective feature’s value was positive while not inhibiting the integrity of our model was of the utmost importance so we found the minimum of our training and testing data, took its absolute value plus 0.00001, and added this to our training and test data before square rooting. Similarly to our original optimized model, we used SelectKBest to decrease our featurespace and calculated our training and validation accuracies.
+
+Figure 5: Logistic Regression Coefficients (Transformed Feature Model)
+Dataset
+Square Root Transformation Degree
+
+
+Original
+Transformed 
+Train
+0.9791592208720514
+0.9791666666666666
+Test
+0.9791592208720514
+0.9791666698776302
+
+Table 2: Square Root feature transformation results
+
+
+---
+
+## Model Training
+**Training the selected models**  
+Information on training processes and tools used.
+
+---
+
+## Model Evaluation
+**Evaluating model performance**  
+Includes metrics used for evaluation and results.
+
+---
+
+## Conclusion
+**Summary of findings**  
+Insights and future work.
+
+---
+
+
+
+
+
+
+
+# Machine Learning Final Project
+## by Faith Villarreal and Ricky Zapata
+
+
+
 Logistic Regression
 The first model that our team utilized was a logistic regression model for classifying whether a user would skip the song being played or not. We used Scikit-Learn's LogisticRegression from the linear model module as well as other modules from the Scikit-Learn library to work towards optimizing our logistic regression code. The following is how we worked toward acquiring the best hyperparameters.
 L1 and L2 Regularization
